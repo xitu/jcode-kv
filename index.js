@@ -21,7 +21,7 @@ async function auth(ctx, next) {
   if(origin !== 'https://code.devrank.cn') {
     ctx.throw(403, JSON.stringify({reason: '非法访问'}));
   } else if((!xProjectId && (!referer || !referer.includes('?projectId')))) {
-    ctx.throw(403, JSON.stringify({reason: '缺少projectId, 需要在HTML中添加<meta name="referrer" content="no-referrer-when-downgrade"/>'}));
+    ctx.throw(403, JSON.stringify({reason: '缺少projectId，需要在HTML中添加<meta name="referrer" content="no-referrer-when-downgrade"/>，Safari浏览器请取“消阻止跨站跟踪选项”。'}));
   } else {
     ctx._projectId = xProjectId || (referer && referer.split('?projectId=')[1]);
     await next();
