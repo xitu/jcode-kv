@@ -17,12 +17,13 @@ router.get('/', async (ctx, next) => {
 async function auth(ctx, next) {
   const origin = ctx.request.header.origin;
   const referer = ctx.request.headers.referer;
+  const xProjectId = ctx.request.headers['X-Project-Id'];
   if(origin !== 'https://code.devrank.cn') {
     ctx.throw(403, {reason: '非法访问'});
-  } else if(!referer || !referer.includes('?projectId')) {
+  } else if((!referer || !referer.includes('?projectId')) && !xProjectId) {
     ctx.throw(403, {reason: '缺少projectId, 需要在HTML中添加<meta name="referrer" content="no-referrer-when-downgrade"/>'});
   } else {
-    ctx._projectId = referer.split('?projectId=')[1];
+    ctx._projectId = (referer && referer.split('?projectId=')[1]) || xProjectId;
     await next();
   }
 }
