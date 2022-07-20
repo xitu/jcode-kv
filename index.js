@@ -67,6 +67,8 @@ router.put('/doc/:id', auth, async (ctx, next) => {
   const res = {};
   try {
     res.result = await db.get(id);
+    delete(res.result._id);
+    delete(res.result._rev);
   } catch(ex) {
     res.error = {reason: ex.message};
   } finally {
