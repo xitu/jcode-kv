@@ -19,9 +19,9 @@ async function auth(ctx, next) {
   const origin = ctx.request.header.origin;
   const referer = ctx.request.headers.referer;
   if(origin !== 'https://code.devrank.cn') {
-    ctx.throw(403, '非法访问');
+    ctx.throw(403, JSON.stringify({reason: '非法访问'}));
   } else if(!referer || !referer.includes('/?projectId')) {
-    ctx.throw(403, '缺少projectId, 需要在HTML中添加<meta name="referrer" content="no-referrer-when-downgrade"/>')
+    ctx.throw(403, JSON.stringify({reason: '缺少projectId, 需要在HTML中添加<meta name="referrer" content="no-referrer-when-downgrade"/>'}));
   } else {
     await next();
   }
@@ -35,7 +35,7 @@ router.put('/doc/:id', auth, async (ctx, next) => {
     const res = await db.insert({_id: id, ...data});
     ctx.body = res;
   } catch(ex) {
-    ctx.throw(403, ex.message);
+    ctx.throw(403, JSON.stringify({reason: ex.message}));
   }
 });
 
@@ -48,7 +48,7 @@ router.post('/doc/:id', auth, async (ctx, next) => {
     const res = await db.insert({_id: id, ...data, _rev});
     ctx.body = res;
   } catch(ex) {
-    ctx.throw(403, ex.message);
+    ctx.throw(403, JSON.stringify({reason: ex.message}));
   }
 });
 
@@ -60,7 +60,7 @@ router.del('/doc/:id', auth, async (ctx, next) => {
     const res = await db.destroy(id, _rev);
     ctx.body = res;
   } catch(ex) {
-    ctx.throw(404, ex.message);
+    ctx.throw(404, JSON.stringify({reason: ex.message}));
   }
 });
 
@@ -71,7 +71,7 @@ router.get('/doc/:id', auth, async (ctx, next) => {
     const info = await db.get(id);
     ctx.body = info;
   } catch(ex) {
-    ctx.throw(404, ex.message);
+    ctx.throw(404, JSON.stringify({reason: ex.message}));
   }
 });
 
