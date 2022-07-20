@@ -20,10 +20,10 @@ async function auth(ctx, next) {
   const xProjectId = ctx.request.headers['x-project-id'];
   if(origin !== 'https://code.devrank.cn') {
     ctx.throw(403, JSON.stringify({reason: '非法访问'}));
-  } else if((!referer || !referer.includes('?projectId')) && !xProjectId) {
+  } else if((!xProjectId && (!referer || !referer.includes('?projectId')))) {
     ctx.throw(403, JSON.stringify({reason: '缺少projectId, 需要在HTML中添加<meta name="referrer" content="no-referrer-when-downgrade"/>'}));
   } else {
-    ctx._projectId = (referer && referer.split('?projectId=')[1]) || xProjectId;
+    ctx._projectId = xProjectId || (referer && referer.split('?projectId=')[1]);
     await next();
   }
 }
