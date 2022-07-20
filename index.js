@@ -19,9 +19,9 @@ async function auth(ctx, next) {
   const referer = ctx.request.headers.referer;
   const xProjectId = ctx.request.headers['X-Project-Id'];
   if(origin !== 'https://code.devrank.cn') {
-    ctx.throw(403, {reason: '非法访问'});
+    ctx.throw(403, JSON.stringify({reason: '非法访问'}));
   } else if((!referer || !referer.includes('?projectId')) && !xProjectId) {
-    ctx.throw(403, {reason: '缺少projectId, 需要在HTML中添加<meta name="referrer" content="no-referrer-when-downgrade"/>'});
+    ctx.throw(403, JSON.stringify({reason: '缺少projectId, 需要在HTML中添加<meta name="referrer" content="no-referrer-when-downgrade"/>'}));
   } else {
     ctx._projectId = (referer && referer.split('?projectId=')[1]) || xProjectId;
     await next();
