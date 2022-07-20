@@ -1,0 +1,23 @@
+{
+  "name": "jcode-kv",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/jcode-kv.js",
+  "scripts": {
+    "start": "node index",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.13.0",
+    "eslint-config-sprite": "^1.0.6",
+    "koa": "^2.13.4",
+    "nano": "^10.0.0"
+  },
+  "dependencies": {
+    "@koa/router": "^12.0.0",
+    "koa-body": "^5.0.0"
+  }
+}
