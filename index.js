@@ -17,7 +17,7 @@ router.get('/', async (ctx, next) => {
 async function auth(ctx, next) {
   const origin = ctx.request.header.origin;
   const referer = ctx.request.headers.referer;
-  const xProjectId = ctx.request.headers['X-Project-Id'];
+  const xProjectId = ctx.request.headers['x-project-id'];
   if(origin !== 'https://code.devrank.cn') {
     ctx.throw(403, JSON.stringify({reason: '非法访问'}));
   } else if((!referer || !referer.includes('?projectId')) && !xProjectId) {
