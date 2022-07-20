@@ -20,7 +20,7 @@ async function auth(ctx, next) {
   const referer = ctx.request.headers.referer;
   if(origin !== 'https://code.devrank.cn') {
     ctx.throw(403, JSON.stringify({reason: '非法访问'}));
-  } else if(!referer || !referer.includes('/?projectId')) {
+  } else if(!referer || !referer.includes('?projectId')) {
     ctx.throw(403, JSON.stringify({reason: '缺少projectId, 需要在HTML中添加<meta name="referrer" content="no-referrer-when-downgrade"/>'}));
   } else {
     await next();
