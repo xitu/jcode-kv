@@ -1,4 +1,4 @@
-const {user, password} = require('./db.config');
+const {user, password, host, port} = require('./db.config');
 const nano = require('nano')(`http://${user}:${password}@couchdb.juejin.fun`);
 const db = nano.use('jcode');
 
@@ -74,4 +74,4 @@ app
   .use(router.routes())
   .use(router.allowedMethods());
 
-app.listen(3000, 'dev.juejin.fun');
+app.listen(port, host);
