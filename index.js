@@ -18,9 +18,9 @@ async function auth(ctx, next) {
   const origin = ctx.request.header.origin;
   const referer = ctx.request.headers.referer;
   if(origin !== 'https://code.devrank.cn') {
-    ctx.throw(403, JSON.stringify({reason: '非法访问'}));
+    ctx.throw(403, {reason: '非法访问'});
   } else if(!referer || !referer.includes('?projectId')) {
-    ctx.throw(403, JSON.stringify({reason: '缺少projectId, 需要在HTML中添加<meta name="referrer" content="no-referrer-when-downgrade"/>'}));
+    ctx.throw(403, {reason: '缺少projectId, 需要在HTML中添加<meta name="referrer" content="no-referrer-when-downgrade"/>'});
   } else {
     ctx._projectId = referer.split('?projectId=')[1];
     await next();
@@ -31,38 +31,46 @@ async function auth(ctx, next) {
 router.put('/doc/:id', auth, async (ctx, next) => {
   const id = `${ctx.params.id}.${ctx._projectId}`;
   const data = ctx.request.body;
+  const res = {};
   try {
-    const res = await db.insert({_id: id, ...data});
-    ctx.body = res;
+    res.result = await db.insert({_id: id, ...data});
   } catch(ex) {
-    ctx.throw(403, JSON.stringify({reason: ex.message}));
+    res.error = {reason: ex.message}
+  } finally {
+    ctx.body = res;
   }
 }).post('/doc/:id', auth, async (ctx, next) => {
   const id = `${ctx.params.id}.${ctx._projectId}`;
   const data = ctx.request.body;
+  const res = {};
   try {
     const {_rev} = await db.get(id);
-    const res = await db.insert({_id: id, ...data, _rev});
-    ctx.body = res;
+    res.result = await db.insert({_id: id, ...data, _rev});
   } catch(ex) {
-    ctx.throw(403, JSON.stringify({reason: ex.message}));
+    res.error = {reason: ex.message};
+  } finally {
+    ctx.body = res;
   }
 }).del('/doc/:id', auth, async (ctx, next) => {
   const id = `${ctx.params.id}.${ctx._projectId}`;
+  const res = {};
   try {
     const {_rev} = await db.get(id);
-    const res = await db.destroy(id, _rev);
-    ctx.body = res;
+    res.result = await db.destroy(id, _rev);
   } catch(ex) {
-    ctx.throw(404, JSON.stringify({reason: ex.message}));
+    res.error = {reason: ex.message};
+  } finally {
+    ctx.body = res;
   }
 }).get('/doc/:id', auth, async (ctx, next) => {
+  const id = `${ctx.params.id}.${ctx._projectId}`;
+  const res = {};
   try {
-    const id = `${ctx.params.id}.${ctx._projectId}`;
-    const info = await db.get(id);
-    ctx.body = info;
+    res.result = await db.get(id);
   } catch(ex) {
-    ctx.throw(404, JSON.stringify({reason: ex.message}));
+    res.error = {reason: ex.message};
+  } finally {
+    ctx.body = res;
   }
 });
 
