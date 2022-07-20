@@ -16,8 +16,15 @@ router.get('/', async (ctx, next) => {
 
 // 鉴权 + 获得 projectID
 async function auth(ctx, next) {
-  console.log(ctx.request.headers);
-  await next();
+  const origin = ctx.request.header.origin;
+  const referer = ctx.request.headers.referer;
+  if(origin !== 'https://code.devrank.cn') {
+    ctx.throw(403, '非法访问');
+  } else if(!referer || !referer.includes('/?projectId')) {
+    ctx.throw(403, '缺少projectId, 需要在HTML中添加<meta name="referrer" content="no-referrer-when-downgrade"/>')
+  } else {
+    await next();
+  }
 }
 
 // insert
