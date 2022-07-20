@@ -23,13 +23,14 @@ async function auth(ctx, next) {
   } else if(!referer || !referer.includes('?projectId')) {
     ctx.throw(403, JSON.stringify({reason: '缺少projectId, 需要在HTML中添加<meta name="referrer" content="no-referrer-when-downgrade"/>'}));
   } else {
+    ctx._projectId = referer.split('?projectId=')[1];
     await next();
   }
 }
 
 // insert
 router.put('/doc/:id', auth, async (ctx, next) => {
-  const {id} = ctx.params;
+  const id = `${ctx.params.id}.${ctx._projectId}`;
   const data = ctx.request.body;
   try {
     const res = await db.insert({_id: id, ...data});
@@ -41,7 +42,7 @@ router.put('/doc/:id', auth, async (ctx, next) => {
 
 // post
 router.post('/doc/:id', auth, async (ctx, next) => {
-  const {id} = ctx.params;
+  const id = `${ctx.params.id}.${ctx._projectId}`;
   const data = ctx.request.body;
   try {
     const {_rev} = await db.get(id);
@@ -54,7 +55,7 @@ router.post('/doc/:id', auth, async (ctx, next) => {
 
 // delete
 router.del('/doc/:id', auth, async (ctx, next) => {
-  const {id} = ctx.params;
+  const id = `${ctx.params.id}.${ctx._projectId}`;
   try {
     const {_rev} = await db.get(id);
     const res = await db.destroy(id, _rev);
@@ -67,7 +68,7 @@ router.del('/doc/:id', auth, async (ctx, next) => {
 // get
 router.get('/doc/:id', auth, async (ctx, next) => {
   try {
-    const {id} = ctx.params;
+    const id = `${ctx.params.id}.${ctx._projectId}`;
     const info = await db.get(id);
     ctx.body = info;
   } catch(ex) {
