@@ -28,8 +28,7 @@ async function auth(ctx, next) {
   }
 }
 
-// insert
-router.put('/doc/:id', auth, async (ctx, next) => {
+router.put('/doc/:id', auth, async (ctx, next) => { // insert
   const id = `${ctx.params.id}.${ctx._projectId}`;
   const data = ctx.request.body;
   const res = {};
@@ -40,7 +39,23 @@ router.put('/doc/:id', auth, async (ctx, next) => {
   } finally {
     ctx.body = res;
   }
-}).post('/doc/:id', auth, async (ctx, next) => {
+}).post('/doc/append/:id', auth, async (ctx, next) => { // insert or update
+  const id = `${ctx.params.id}.${ctx._projectId}`;
+  const data = ctx.request.body;
+  const res = {};
+  try {
+    const {_rev} = await db.get(id);
+    res.result = await db.insert({_id: id, ...data, _rev});
+  } catch(ex) {
+    try {
+      res.result = await db.insert({_id: id, ...data});
+    } catch(ex) {
+      res.error = {reason: ex.message};
+    }
+  } finally {
+    ctx.body = res;
+  }
+}).post('/doc/:id', auth, async (ctx, next) => { // update
   const id = `${ctx.params.id}.${ctx._projectId}`;
   const data = ctx.request.body;
   const res = {};
@@ -52,7 +67,7 @@ router.put('/doc/:id', auth, async (ctx, next) => {
   } finally {
     ctx.body = res;
   }
-}).del('/doc/:id', auth, async (ctx, next) => {
+}).del('/doc/:id', auth, async (ctx, next) => { // delete
   const id = `${ctx.params.id}.${ctx._projectId}`;
   const res = {};
   try {
@@ -63,7 +78,7 @@ router.put('/doc/:id', auth, async (ctx, next) => {
   } finally {
     ctx.body = res;
   }
-}).get('/doc/:id', auth, async (ctx, next) => {
+}).get('/doc/:id', auth, async (ctx, next) => { // get
   const id = `${ctx.params.id}.${ctx._projectId}`;
   const res = {};
   try {
